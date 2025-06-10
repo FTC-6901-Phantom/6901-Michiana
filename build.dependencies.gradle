@@ -29,5 +29,10 @@ dependencies {
     implementation "com.acmerobotics.roadrunner:core:1.0.1"
     implementation "com.acmerobotics.roadrunner:actions:1.0.1"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
+
+    //vision
+    implementation 'com.github.Weaponboy:Nexus_Pathing:v3.7.9'
+    implementation 'org.tensorflow:tensorflow-lite-task-vision:0.4.3'
+    runtimeOnly 'org.tensorflow:tensorflow-lite:2.12.0'
 }
 

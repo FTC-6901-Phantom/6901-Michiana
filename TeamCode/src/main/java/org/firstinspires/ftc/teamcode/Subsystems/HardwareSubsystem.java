@@ -117,6 +117,9 @@ public class HardwareSubsystem {
         LeftLift.setPosition(nuetral);
         RightLift.setPosition(nuetral);
     }
+    public double getArm() {
+        return LeftLift.getPosition() + RightLift.getPosition() / 2;
+    }
 
     //Wrist
     public void wristNuetral() {
@@ -124,6 +127,12 @@ public class HardwareSubsystem {
     }
     public void wristHorizontal() {
         Wrist.setPosition(horizontalPose);
+    }
+    public void setTilt(double newPose) {
+        Wrist.setPosition(newPose);
+    }
+    public double getTilt() {
+        return Wrist.getPosition();
     }
 
     //Pitch
