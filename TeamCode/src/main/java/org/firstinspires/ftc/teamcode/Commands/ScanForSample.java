@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.Commands;
+import com.arcrobotics.ftclib.command.CommandBase;
 import com.pedropathing.follower.Follower;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.HardwareSubsystem;
 import org.firstinspires.ftc.teamcode.Vision.Limelight;
 
-public class ScanForSample {
+public class ScanForSample extends CommandBase {
 
     private Limelight limelight;
     private Limelight.SampleState result;

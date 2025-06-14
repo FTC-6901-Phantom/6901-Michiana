@@ -1,26 +1,26 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Util.Subsystem;
 
-@Config
-public class HardwareSubsystem {
+
+public class HardwareSubsystem extends SubsystemBase {
     public HardwareMap hardwareMap;
     public Telemetry telemetry;
     public Servo LeftLift, RightLift;
     public Servo Pitch, Wrist, Claw;
+    public Subsystem.ClimbState climbState;
+    public Subsystem.SlideState slideState;
+    public Subsystem.ClawState clawState;
+    public Subsystem.PitchState pitchState;
+    public Subsystem.ArmState armState;
+    public Subsystem.WristState wristState;
 
     public DcMotor LeftSlide, RightSlide, LeftHang, RightHang;
 
@@ -52,24 +52,22 @@ public class HardwareSubsystem {
     public static int climb = 0;
     public int hangCurrent = 0;
 
-    public HardwareSubsystem(OpMode opMode) {
-        this.hardwareMap = opMode.hardwareMap;
-        this.telemetry = opMode.telemetry;
+    public HardwareSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
 
         //Servos
-        LeftLift = (Servo) opMode.hardwareMap.get("LeftLift");
-        RightLift = (Servo) opMode.hardwareMap.get("RightLift");
-        Pitch = (Servo) opMode.hardwareMap.get("Pitch");
-        Wrist = (Servo) opMode.hardwareMap.get("Wrist");
-        Claw = (Servo) opMode.hardwareMap.get("Claw");
+        LeftLift = (Servo) hardwareMap.get("LeftLift");
+        RightLift = (Servo) hardwareMap.get("RightLift");
+        Pitch = (Servo) hardwareMap.get("Pitch");
+        Wrist = (Servo) hardwareMap.get("Wrist");
+        Claw = (Servo) hardwareMap.get("Claw");
 
         RightLift.setDirection(Servo.Direction.REVERSE);
 
         //Motors
-        LeftSlide = (DcMotor) opMode.hardwareMap.get("LeftSlide");
-        RightSlide = (DcMotor) opMode.hardwareMap.get("RightSlide");
-        LeftHang = (DcMotor) opMode.hardwareMap.get("LeftHang");
-        RightHang = (DcMotor) opMode.hardwareMap.get("RightHang");
+        LeftSlide = (DcMotor) hardwareMap.get("LeftSlide");
+        RightSlide = (DcMotor) hardwareMap.get("RightSlide");
+        LeftHang = (DcMotor) hardwareMap.get("LeftHang");
+        RightHang = (DcMotor) hardwareMap.get("RightHang");
 
         //Slides
         LeftSlide.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -99,34 +97,67 @@ public class HardwareSubsystem {
     public void ClawOpen() {
         Claw.setPosition(openPose);
     }
+    public void ClawSetState(HardwareMap hardwareMap, Subsystem.ClawState clawState) {
+        this.clawState = clawState;
+
+        double position = 0;
+
+        switch (clawState) {
+            case Open:
+                position = openPose;
+                break;
+            case Closed:
+                position = grabPose;
+                break;
+        }
+        this.Claw.setPosition(position);
+    }
+    public double getClaw() {
+        return Claw.getPosition();
+    }
 
     //Arm
-    public void Bucket() {
-        LeftLift.setPosition(scorePose);
-        RightLift.setPosition(scorePose);
-    }
-    public void Intake() {
-        LeftLift.setPosition(intakePose);
-        RightLift.setPosition(intakePose);
-    }
-    public void Hover() {
-        LeftLift.setPosition(hoverPose);
-        RightLift.setPosition(hoverPose);
-    }
-    public void Nuetral() {
-        LeftLift.setPosition(nuetral);
-        RightLift.setPosition(nuetral);
-    }
     public double getArm() {
         return LeftLift.getPosition() + RightLift.getPosition() / 2;
     }
+    public void ArmSetState(HardwareMap hardwareMap, Subsystem.ArmState armState ) {
+        this.armState = armState;
+
+        double position = 0;
+        switch (armState) {
+            case Hover:
+                position = hoverPose;
+                break;
+            case Intake:
+                position = intakePose;
+                break;
+            case Score:
+                position = scorePose;
+                break;
+            case Reset:
+                position = nuetral;
+                break;
+        }
+        this.LeftLift.setPosition(position);
+        this.RightLift.setPosition(position);
+    }
 
     //Wrist
-    public void wristNuetral() {
-        Wrist.setPosition(nuetralPose);
-    }
-    public void wristHorizontal() {
-        Wrist.setPosition(horizontalPose);
+    public void WristSetState(HardwareMap hardwareMap, Subsystem.WristState wristState) {
+        this.wristState = wristState;
+
+        double position = 0;
+
+        switch (wristState) {
+            case Neutral:
+                position = nuetralPose;
+                break;
+            case Horizontal:
+                position = horizontalPose;
+                break;
+        }
+
+        this.Wrist.setPosition(position);
     }
     public void setTilt(double newPose) {
         Wrist.setPosition(newPose);
@@ -136,11 +167,21 @@ public class HardwareSubsystem {
     }
 
     //Pitch
-    public void Score() {
-        Pitch.setPosition(pitch);
-    }
-    public void pitchReset() {
-        Pitch.setPosition(Nan);
+    public void PitchSetState(HardwareMap hardwareMap, Subsystem.PitchState pitchState) {
+        this.pitchState = pitchState;
+
+        double position = 0;
+
+        switch (pitchState) {
+            case Intake:
+                position = pitch;
+                break;
+            case Score:
+                position = Nan;
+                break;
+        }
+
+        this.Pitch.setPosition(position);
     }
 
     //Slides
@@ -157,12 +198,20 @@ public class HardwareSubsystem {
         LeftSlide.setPower(1);
         RightSlide.setPower(1);
     }
+    public void SlideSetState(HardwareMap hardwareMap, Subsystem.SlideState slideState) {
+        this.slideState = slideState;
 
-    public void High() {
-        setLiftPose(High);
-    }
-    public void Reset() {
-        setLiftPose(Reset);
+        int position = 0;
+
+        switch (slideState) {
+            case Retracted:
+                position = Reset;
+                break;
+            case Score:
+                position = High;
+                break;
+        }
+        setLiftPose(position);
     }
 
     //Hang
@@ -179,20 +228,28 @@ public class HardwareSubsystem {
         RightHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightHang.setPower(1);
     }
+    public void ClimbSetState(HardwareMap hardwareMap, Subsystem.ClimbState climbState) {
+        this.climbState = climbState;
 
-    public void LineUp() {
-        setHangPose(lineUp);
-    }
-    public void Climb() {
-        setHangPose(climb);
+        int position = 0;
+
+        switch (climbState) {
+            case Retract:
+                position = climb;
+                break;
+            case Hang:
+                position = lineUp;
+                break;
+        }
+        setHangPose(position);
     }
 
     public void init() {
-        ClawOpen();
-        Climb();
-        Reset();
-        Score();
-        wristNuetral();
-        Nuetral();
+        ClawSetState(hardwareMap, Subsystem.ClawState.Open);
+        WristSetState(hardwareMap, Subsystem.WristState.Neutral);
+        //ClimbSetState(hardwareMap, Subsystem.ClimbState.Retract);
+        SlideSetState(hardwareMap, Subsystem.SlideState.Retracted);
+        PitchSetState(hardwareMap, Subsystem.PitchState.Score);
+        ArmSetState(hardwareMap, Subsystem.ArmState.Reset);
     }
 }
