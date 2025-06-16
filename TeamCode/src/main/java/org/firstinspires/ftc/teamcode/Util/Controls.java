@@ -17,12 +17,21 @@ public class Controls {
         public GamepadButton Lift;
         public GamepadButton Swap;
 
+        public DoubleSupplier driveY;
+        public DoubleSupplier driveX;
+        public DoubleSupplier yaw;
+
         public Buttons(Gamepad gamepad1) {
             this.gamepad1 = new GamepadEx(gamepad1);
 
             this.Cycle = this.gamepad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER);
             this.Wrist = this.gamepad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER);
             this.Lift = this.gamepad1.getGamepadButton(GamepadKeys.Button.B);
+
+            // Method reference to avoid creating a lambda
+            this.driveY = this.gamepad1::getLeftY;
+            this.driveX = this.gamepad1::getLeftX;
+            this.yaw = this.gamepad1::getRightX;
         }
     }
 }

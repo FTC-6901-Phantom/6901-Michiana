@@ -25,10 +25,10 @@ public class HardwareSubsystem extends SubsystemBase {
     public DcMotor LeftSlide, RightSlide, LeftHang, RightHang;
 
     //Arm Pose
-    public static double intakePose = 0.05, scorePose = 0.7, hoverPose = 0.15, nuetral = 0.5;
+    public static double intakePose = 0.15, scorePose = 1, hoverPose = 0.25, nuetral = 0.7;
 
     //Claw Pose
-    public static double openPose = 0.4, grabPose = 0.7;
+    public static double openPose = 0.4, grabPose = 0.65;
 
     //Wrist Pose
     public static double nuetralPose = 0.3, horizontalPose = 0.65;
@@ -51,6 +51,13 @@ public class HardwareSubsystem extends SubsystemBase {
     public static int lineUp = 1450;
     public static int climb = 0;
     public int hangCurrent = 0;
+
+    public boolean isIntake() {
+        return LeftLift.getPosition() == intakePose;
+    }
+    public boolean isGrabbed() {
+        return Claw.getPosition() == grabPose;
+    }
 
     public HardwareSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
 
@@ -97,7 +104,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public void ClawOpen() {
         Claw.setPosition(openPose);
     }
-    public void ClawSetState(HardwareMap hardwareMap, Subsystem.ClawState clawState) {
+    public void ClawSetState(Subsystem.ClawState clawState) {
         this.clawState = clawState;
 
         double position = 0;
@@ -120,7 +127,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public double getArm() {
         return LeftLift.getPosition() + RightLift.getPosition() / 2;
     }
-    public void ArmSetState(HardwareMap hardwareMap, Subsystem.ArmState armState ) {
+    public void ArmSetState(Subsystem.ArmState armState ) {
         this.armState = armState;
 
         double position = 0;
@@ -143,7 +150,7 @@ public class HardwareSubsystem extends SubsystemBase {
     }
 
     //Wrist
-    public void WristSetState(HardwareMap hardwareMap, Subsystem.WristState wristState) {
+    public void WristSetState(Subsystem.WristState wristState) {
         this.wristState = wristState;
 
         double position = 0;
@@ -167,17 +174,17 @@ public class HardwareSubsystem extends SubsystemBase {
     }
 
     //Pitch
-    public void PitchSetState(HardwareMap hardwareMap, Subsystem.PitchState pitchState) {
+    public void PitchSetState(Subsystem.PitchState pitchState) {
         this.pitchState = pitchState;
 
         double position = 0;
 
         switch (pitchState) {
             case Intake:
-                position = pitch;
+                position = Nan;
                 break;
             case Score:
-                position = Nan;
+                position = pitch;
                 break;
         }
 
@@ -195,10 +202,10 @@ public class HardwareSubsystem extends SubsystemBase {
         RightSlide.setTargetPosition(slideCurrent);
         LeftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        LeftSlide.setPower(1);
-        RightSlide.setPower(1);
+        LeftSlide.setPower(0.75);
+        RightSlide.setPower(0.75);
     }
-    public void SlideSetState(HardwareMap hardwareMap, Subsystem.SlideState slideState) {
+    public void SlideSetState(Subsystem.SlideState slideState) {
         this.slideState = slideState;
 
         int position = 0;
@@ -228,7 +235,7 @@ public class HardwareSubsystem extends SubsystemBase {
         RightHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightHang.setPower(1);
     }
-    public void ClimbSetState(HardwareMap hardwareMap, Subsystem.ClimbState climbState) {
+    public void ClimbSetState(Subsystem.ClimbState climbState) {
         this.climbState = climbState;
 
         int position = 0;
@@ -244,12 +251,21 @@ public class HardwareSubsystem extends SubsystemBase {
         setHangPose(position);
     }
 
+    //Auto Stuff
+    public void raiseSlides() {
+        this.ArmSetState(Subsystem.ArmState.Score);
+        this.SlideSetState(Subsystem.SlideState.Score);
+    }
+    public void grabSample() {
+        this.ClawSetState(Subsystem.ClawState.Closed);
+    }
+
     public void init() {
-        ClawSetState(hardwareMap, Subsystem.ClawState.Open);
-        WristSetState(hardwareMap, Subsystem.WristState.Neutral);
+        ClawSetState(Subsystem.ClawState.Open);
+        WristSetState(Subsystem.WristState.Neutral);
         //ClimbSetState(hardwareMap, Subsystem.ClimbState.Retract);
-        SlideSetState(hardwareMap, Subsystem.SlideState.Retracted);
-        PitchSetState(hardwareMap, Subsystem.PitchState.Score);
-        ArmSetState(hardwareMap, Subsystem.ArmState.Reset);
+        SlideSetState(Subsystem.SlideState.Retracted);
+        PitchSetState(Subsystem.PitchState.Intake);
+        ArmSetState(Subsystem.ArmState.Reset);
     }
 }

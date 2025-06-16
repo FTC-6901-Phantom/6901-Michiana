@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.Util.cmd.sleep;
+
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Util.cmd;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -14,20 +20,19 @@ public class IntakeSubsystem extends SubsystemBase {
     public HardwareSubsystem robot;
     public Telemetry telemetry;
 
+    public ElapsedTime time;
+
     //Internal Subsystem State
     public Subsystem.CycleState cycleState;
     public Subsystem.SlideState slideState;
-    public Subsystem.ClawState clawState;
-    public Subsystem.PitchState pitchState;
-    public Subsystem.ArmState armState;
-    public Subsystem.ClimbState climbState;
     public Subsystem.WristState wristState;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.wristState = Subsystem.WristState.Neutral;
-        this.cycleState = Subsystem.CycleState.Score;
+        this.cycleState = Subsystem.CycleState.Finish;
         this.robot = new HardwareSubsystem(hardwareMap, telemetry);
         this.telemetry = telemetry;
+        this.time = new ElapsedTime();
 
         robot.init();
     }
@@ -38,12 +43,24 @@ public class IntakeSubsystem extends SubsystemBase {
                 this.cycleState = Subsystem.CycleState.Intake;
                 break;
             case Intake:
+                this.cycleState = Subsystem.CycleState.Grab;
+                break;
+            case Grab:
+                this.cycleState = Subsystem.CycleState.Return;
+                break;
+            case Return:
                 this.cycleState = Subsystem.CycleState.Score;
                 break;
             case Score:
-                this.cycleState = Subsystem.CycleState.Hover;
+                this.cycleState = Subsystem.CycleState.Finish;
                 break;
+            case Finish:
+                this.cycleState = Subsystem.CycleState.Hover;
         }
+    }
+
+    public void Reset() {
+        this.cycleState = Subsystem.CycleState.Hover;
     }
 
     public void nextWrist() {
@@ -62,36 +79,58 @@ public class IntakeSubsystem extends SubsystemBase {
         telemetry.addData("Cycle", this.cycleState.toString());
         telemetry.addData("Wrist", this.wristState.toString());
 
+        telemetry.addLine();
+        telemetry.addData("ClawPose", robot.getClaw());
+        telemetry.addData("ArmPose", robot.getArm());
+
         switch (this.cycleState) {
             case Hover:
-                robot.ArmSetState(this.robot.hardwareMap, Subsystem.ArmState.Hover);
-                robot.ClawSetState(this.robot.hardwareMap, Subsystem.ClawState.Open);
-                robot.WristSetState(this.robot.hardwareMap, Subsystem.WristState.Neutral);
+                time.reset();
+                robot.SlideSetState(Subsystem.SlideState.Retracted);
+                robot.ArmSetState(Subsystem.ArmState.Hover);
+                robot.ClawSetState(Subsystem.ClawState.Open);
+                robot.WristSetState(Subsystem.WristState.Neutral);
+                robot.PitchSetState(Subsystem.PitchState.Intake);
                 break;
             case Intake:
-                robot.ArmSetState(this.robot.hardwareMap, Subsystem.ArmState.Intake);
-                if (robot.getArm() == HardwareSubsystem.intakePose) {
-                    robot.ClawSetState(this.robot.hardwareMap, Subsystem.ClawState.Closed);
-                } if (robot.getClaw() == HardwareSubsystem.grabPose) {
-                    robot.ArmSetState(this.robot.hardwareMap, Subsystem.ArmState.Score);
-                    robot.PitchSetState(this.robot.hardwareMap, Subsystem.PitchState.Score);
+                time.startTime();
+                robot.ArmSetState(Subsystem.ArmState.Intake);
+                if (robot.isIntake()) nextCycle();
+                break;
+            case Grab:
+                if (time.seconds() >= 0.2) {
+                    robot.ClawSetState(Subsystem.ClawState.Closed);
+                }
+                if (robot.isGrabbed() && robot.isIntake()) nextCycle();
+                break;
+            case Return:
+                if (time.seconds() < 0.7) robot.ArmSetState(Subsystem.ArmState.Hover);
+                if (time.seconds() >= 0.7) {
+                    robot.ArmSetState(Subsystem.ArmState.Reset);
+                    robot.PitchSetState(Subsystem.PitchState.Score);
                 }
                 break;
             case Score:
-                robot.ClawSetState(this.robot.hardwareMap, Subsystem.ClawState.Open);
-                if (robot.getClaw() == HardwareSubsystem.openPose) {
-                    robot.SlideSetState(this.robot.hardwareMap, Subsystem.SlideState.Retracted);
-                    robot.ArmSetState(this.robot.hardwareMap, Subsystem.ArmState.Reset);
+                robot.SlideSetState(Subsystem.SlideState.Score);
+                robot.ArmSetState(Subsystem.ArmState.Score);
+                time.reset();
+                break;
+            case Finish:
+                time.startTime();
+                robot.ClawSetState(Subsystem.ClawState.Open);
+                if (time.seconds() > 0.4) {
+                    robot.SlideSetState(Subsystem.SlideState.Retracted);
+                    robot.ArmSetState(Subsystem.ArmState.Reset);
                 }
                 break;
         }
 
         switch (this.wristState) {
             case Neutral:
-                robot.WristSetState(this.robot.hardwareMap, Subsystem.WristState.Neutral);
+                robot.WristSetState(Subsystem.WristState.Neutral);
                 break;
             case Horizontal:
-                robot.WristSetState(this.robot.hardwareMap, Subsystem.WristState.Horizontal);
+                robot.WristSetState(Subsystem.WristState.Horizontal);
                 break;
         }
     }

@@ -44,7 +44,10 @@ public class Subsystem {
     public enum CycleState {
         Hover,
         Intake,
-        Score
+        Grab,
+        Return,
+        Score,
+        Finish
     }
 
     //Spec states

@@ -19,6 +19,10 @@ public class FollowerSubsystem extends SubsystemBase {
         follower.startTeleopDrive();
     }
 
+    public void resetIMU() {
+
+    }
+
     public void setMovement(double f, double s, double t) {
         this.forward = f;
         this.strafe = s;

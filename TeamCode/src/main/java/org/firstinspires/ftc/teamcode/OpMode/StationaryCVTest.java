@@ -28,7 +28,7 @@ public class StationaryCVTest extends CommandOpMode {
         this.buffer = new Limelight.SampleState();
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         this.limelight = new Limelight(hardwareMap, Limelight.Targets.YellowOnly);
-        robot = new HardwareSubsystem(hardwareMap, telemetry);
+        this.robot = new HardwareSubsystem(hardwareMap, telemetry);
 
         schedule(
                 new RunCommand(follower::update),

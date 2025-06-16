@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpMode;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -33,6 +34,7 @@ public class TeleOpMain extends CommandOpMode {
 
         buttons.Cycle.whenPressed(cmd.teleopCycle(intakeSubsystem));
         buttons.Wrist.whenPressed(cmd.teleopWrist(intakeSubsystem));
+        buttons.Lift.whenPressed(cmd.teleopReset(intakeSubsystem));
 
         schedule(new RunCommand(() -> {
             followerSubsystem.setMovement(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
