@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Util.Constants.FConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.LConstants;
 import org.firstinspires.ftc.teamcode.Util.cmd;
 
-@Autonomous(name = "0+4", group = "Daniella Cortez")
+@Autonomous(name = "0+6", group = "Daniella Cortez")
 public class SixSamp extends CommandOpMode {
 
     public AutoSubsystem autoSubsystem;
@@ -84,6 +84,24 @@ public class SixSamp extends CommandOpMode {
                         // Score 4th sample
                         cmd.followPath(follower, Paths.score4()),
                         new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()),
+
+                        //Sub Cycle 1
+                        cmd.followPath(follower, Paths.sub1()),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
+
+                        //Score 5th
+                        cmd.followPath(follower, Paths.score5()),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()),
+
+                        //Sub Cycle 2
+                        cmd.followPath(follower, Paths.sub2()),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
+
+                        //Score 6th
+                        cmd.followPath(follower, Paths.score6()),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
                         new InstantCommand(() -> autoSubsystem.nextAutoCycle())
                 )
         );
@@ -97,10 +115,7 @@ class Paths {
     public static Pose second = new Pose (32, 122, Math.toRadians(0));
     public static Pose third = new Pose(31, 131, Math.toRadians(0));
     public static Pose fourth = new Pose(35, 133, Math.toRadians(28));
-    public static Pose drag = new Pose(72-8, 100, Math.toRadians(270));
-    public static Pose sub2 = new Pose(63, 94, Math.toRadians(-90));
-    public static Pose subControlPoint = new Pose(66.40214477211796, 111.95710455764075);
-    public static Pose sub3 = new Pose(67, 92, Math.toRadians(-90));
+    public static Pose sub = new Pose(63, 94, Math.toRadians(-90));
     public static Pose park = new Pose(57.25, 94.5, Math.toRadians(270));
     public static PathChain score1() {
         return new PathBuilder()
@@ -179,14 +194,14 @@ class Paths {
                 .build();
     }
 
-    public static PathChain sub2() {
+    public static PathChain sub1() {
         return new PathBuilder()
                 .addPath(
                         new BezierCurve(
-                                score, subControlPoint, sub2
+                                score, sub
                         )
                 )
-                .setLinearHeadingInterpolation(score.getHeading(), sub2.getHeading())
+                .setLinearHeadingInterpolation(score.getHeading(), sub.getHeading())
                 .setZeroPowerAccelerationMultiplier(1.5)
                 .build();
     }
@@ -195,22 +210,22 @@ class Paths {
         return new PathBuilder()
                 .addPath(
                         new BezierLine(
-                                sub2, score
+                                sub, score
                         )
                 )
-                .setLinearHeadingInterpolation(sub2.getHeading(), score.getHeading())
+                .setLinearHeadingInterpolation(sub.getHeading(), score.getHeading())
                 .setZeroPowerAccelerationMultiplier(1.5)
                 .build();
     }
 
-    public static PathChain sub3() {
+    public static PathChain sub2() {
         return new PathBuilder()
                 .addPath(
                         new BezierCurve(
-                                score, subControlPoint, sub3
+                                score, sub
                         )
                 )
-                .setLinearHeadingInterpolation(score.getHeading(), sub3.getHeading())
+                .setLinearHeadingInterpolation(score.getHeading(), sub.getHeading())
                 .setZeroPowerAccelerationMultiplier(1.5)
                 .build();
     }
@@ -219,31 +234,20 @@ class Paths {
         return new PathBuilder()
                 .addPath(
                         new BezierLine(
-                                sub3, score
+                                sub, score
                         )
                 )
-                .setLinearHeadingInterpolation(sub3.getHeading(), score.getHeading())
+                .setLinearHeadingInterpolation(sub.getHeading(), score.getHeading())
                 .setZeroPowerAccelerationMultiplier(1.5)
                 .build();
     }
 
-    public static PathChain drag() {
-        return new PathBuilder()
-                .addPath(
-                        new BezierLine(
-                                score,drag
-                        )
-                )
-                .setLinearHeadingInterpolation(score.getHeading(), drag.getHeading())
-                .setZeroPowerAccelerationMultiplier(4)
-                .build();
-    }
 
     public static PathChain park(Pose current) {
         return new PathBuilder()
                 .addPath(
                         new BezierLine(
-                                current, park
+                                score, park
                         )
                 )
                 .setLinearHeadingInterpolation(current.getHeading(), park.getHeading())
