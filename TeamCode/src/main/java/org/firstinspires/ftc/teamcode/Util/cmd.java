@@ -49,6 +49,9 @@ public class cmd {
     public static InstantCommand teleopReset(IntakeSubsystem intakeSubsystem) {
         return new InstantCommand(intakeSubsystem::Reset);
     }
+    public static InstantCommand teleSwap(IntakeSubsystem intakeSubsystem) {
+        return new InstantCommand(intakeSubsystem::swapTele);
+    }
 
     //Auto
     public static FollowPath followPath(Follower follower, PathChain pathChain) {

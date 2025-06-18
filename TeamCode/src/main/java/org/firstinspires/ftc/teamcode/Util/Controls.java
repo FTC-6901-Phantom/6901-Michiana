@@ -27,6 +27,7 @@ public class Controls {
             this.Cycle = this.gamepad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER);
             this.Wrist = this.gamepad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER);
             this.Lift = this.gamepad1.getGamepadButton(GamepadKeys.Button.B);
+            this.Swap = this.gamepad1.getGamepadButton(GamepadKeys.Button.Y);
 
             // Method reference to avoid creating a lambda
             this.driveY = this.gamepad1::getLeftY;
