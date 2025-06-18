@@ -103,6 +103,15 @@ public class SixSamp extends CommandOpMode {
                         cmd.followPath(follower, Paths.score6()),
                         new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
                         new InstantCommand(() -> autoSubsystem.nextAutoCycle())
+
+                        //Sub Cycle 3
+//                        cmd.followPath(follower, Paths.sub3()),
+//                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
+//
+//                        //Score 6th
+//                        cmd.followPath(follower, Paths.score7()),
+//                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+//                        new InstantCommand(() -> autoSubsystem.nextAutoCycle())
                 )
         );
     }
@@ -231,6 +240,30 @@ class Paths {
     }
 
     public static PathChain score6() {
+        return new PathBuilder()
+                .addPath(
+                        new BezierLine(
+                                sub, score
+                        )
+                )
+                .setLinearHeadingInterpolation(sub.getHeading(), score.getHeading())
+                .setZeroPowerAccelerationMultiplier(1.5)
+                .build();
+    }
+
+    public static PathChain sub3() {
+        return new PathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                score, sub
+                        )
+                )
+                .setLinearHeadingInterpolation(score.getHeading(), sub.getHeading())
+                .setZeroPowerAccelerationMultiplier(1.5)
+                .build();
+    }
+
+    public static PathChain score7() {
         return new PathBuilder()
                 .addPath(
                         new BezierLine(
