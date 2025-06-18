@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Util;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Commands.grabSample;
 import org.firstinspires.ftc.teamcode.Commands.raiseSlides;
 import org.firstinspires.ftc.teamcode.Subsystems.HardwareSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Subsystem;
 import org.firstinspires.ftc.teamcode.Vision.Limelight;
 
 import java.util.function.BooleanSupplier;
@@ -40,6 +42,38 @@ public class cmd {
     }
 
     //Tele Stuff
+    public static Command grabSample(HardwareSubsystem robot) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> robot.ClawSetState(Subsystem.ClawState.Open)),
+                new InstantCommand(() -> robot.ArmSetState(Subsystem.ArmState.Hover)),
+                new InstantCommand(() -> robot.WristSetState(Subsystem.WristState.Horizontal)),
+                new InstantCommand(() -> robot.PitchSetState(Subsystem.PitchState.Intake)),
+                new WaitCommand(300),
+                new InstantCommand(() -> robot.ArmSetState(Subsystem.ArmState.Intake)),
+                new InstantCommand(() -> robot.ClawSetState(Subsystem.ClawState.Closed)),
+                new WaitCommand(200),
+                new InstantCommand(() -> robot.ArmSetState(Subsystem.ArmState.Reset)) // Assuming Reset == Neutral
+        );
+    }
+
+
+    public static Command dropSample(HardwareSubsystem robot) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> robot.SlideSetState(Subsystem.SlideState.Score)),
+                new WaitCommand(1000),
+                new InstantCommand(() -> robot.ArmSetState(Subsystem.ArmState.Score)),
+                new InstantCommand(() -> robot.PitchSetState(Subsystem.PitchState.Score)), // or Spec if that's what you meant
+                new WaitCommand(300),
+                new InstantCommand(() -> robot.ClawSetState(Subsystem.ClawState.Open)),
+                new WaitCommand(200),
+                new InstantCommand(() -> robot.ArmSetState(Subsystem.ArmState.Reset)), // or Neutral
+                new InstantCommand(() -> robot.SlideSetState(Subsystem.SlideState.Retracted))
+        );
+    }
+    public static InstantCommand raiseSlides(HardwareSubsystem robot) {
+        return new InstantCommand(() -> robot.SlideSetState(Subsystem.SlideState.Score));
+
+    }
     public static InstantCommand teleopCycle(IntakeSubsystem intakeSubsystem) {
         return new InstantCommand(intakeSubsystem::nextCycle);
     }
@@ -57,13 +91,14 @@ public class cmd {
     public static FollowPath followPath(Follower follower, PathChain pathChain) {
         return new FollowPath(follower, pathChain);
     }
-    public static grabSample grabSample(HardwareSubsystem robot) {
-        return new grabSample(robot);
-    }
-    public static raiseSlides raiseSlides(HardwareSubsystem robot) {
-        return new raiseSlides(robot);
-    }
-    public static dropSample dropSample(HardwareSubsystem robot) {
-        return new dropSample(robot);
-    }
+//    public static grabSample grabSample(HardwareSubsystem robot) {
+//        return new grabSample(robot);
+//    }
+//    public static raiseSlides raiseSlides(HardwareSubsystem robot) {
+//        return new raiseSlides(robot);
+//    }
+//    public static dropSample dropSample(HardwareSubsystem robot) {
+//        return new dropSample(robot);
+//    }
+
 }
