@@ -50,6 +50,15 @@ public class Subsystem {
         Finish
     }
 
+    //Auto Cycle states
+    public enum AutoState {
+        Hover,
+        Intake,
+        Grab,
+        Score,
+        Finish
+    }
+
     //Spec states
     public enum SpecState {
         Intake,

@@ -24,12 +24,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
     //Internal Subsystem State
     public Subsystem.CycleState cycleState;
-    public Subsystem.SlideState slideState;
     public Subsystem.WristState wristState;
+    public Subsystem.TeleState teleState;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.wristState = Subsystem.WristState.Neutral;
         this.cycleState = Subsystem.CycleState.Finish;
+        this.teleState = Subsystem.TeleState.Sample;
         this.robot = new HardwareSubsystem(hardwareMap, telemetry);
         this.telemetry = telemetry;
         this.time = new ElapsedTime();
@@ -59,6 +60,17 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public void swapTele() {
+        switch (teleState) {
+            case Spec:
+                this.teleState = Subsystem.TeleState.Sample;
+                break;
+            case Sample:
+                this.teleState = Subsystem.TeleState.Spec;
+                break;
+        }
+    }
+
     public void Reset() {
         this.cycleState = Subsystem.CycleState.Hover;
     }
@@ -78,50 +90,59 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         telemetry.addData("Cycle", this.cycleState.toString());
         telemetry.addData("Wrist", this.wristState.toString());
+        telemetry.addData("TeleState", this.teleState.toString());
 
         telemetry.addLine();
         telemetry.addData("ClawPose", robot.getClaw());
         telemetry.addData("ArmPose", robot.getArm());
 
-        switch (this.cycleState) {
-            case Hover:
-                time.reset();
-                robot.SlideSetState(Subsystem.SlideState.Retracted);
-                robot.ArmSetState(Subsystem.ArmState.Hover);
-                robot.ClawSetState(Subsystem.ClawState.Open);
-                robot.WristSetState(Subsystem.WristState.Neutral);
-                robot.PitchSetState(Subsystem.PitchState.Intake);
-                break;
-            case Intake:
-                time.startTime();
-                robot.ArmSetState(Subsystem.ArmState.Intake);
-                if (robot.isIntake()) nextCycle();
-                break;
-            case Grab:
-                if (time.seconds() >= 0.2) {
-                    robot.ClawSetState(Subsystem.ClawState.Closed);
+
+        switch (this.teleState) {
+            case Sample:
+                switch (this.cycleState) {
+                    case Hover:
+                        time.reset();
+                        robot.SlideSetState(Subsystem.SlideState.Retracted);
+                        robot.ArmSetState(Subsystem.ArmState.Hover);
+                        robot.ClawSetState(Subsystem.ClawState.Open);
+                        robot.WristSetState(Subsystem.WristState.Neutral);
+                        robot.PitchSetState(Subsystem.PitchState.Intake);
+                        break;
+                    case Intake:
+                        time.startTime();
+                        robot.ArmSetState(Subsystem.ArmState.Intake);
+                        if (robot.isIntake()) nextCycle();
+                        break;
+                    case Grab:
+                        if (time.seconds() >= 0.2) {
+                            robot.ClawSetState(Subsystem.ClawState.Closed);
+                        }
+                        if (robot.isGrabbed() && robot.isIntake()) nextCycle();
+                        break;
+                    case Return:
+                        if (time.seconds() < 0.7) robot.ArmSetState(Subsystem.ArmState.Hover);
+                        if (time.seconds() >= 0.7) {
+                            robot.ArmSetState(Subsystem.ArmState.Reset);
+                            robot.PitchSetState(Subsystem.PitchState.Score);
+                        }
+                        break;
+                    case Score:
+                        robot.SlideSetState(Subsystem.SlideState.Score);
+                        robot.ArmSetState(Subsystem.ArmState.Score);
+                        time.reset();
+                        break;
+                    case Finish:
+                        time.startTime();
+                        robot.ClawSetState(Subsystem.ClawState.Open);
+                        if (time.seconds() > 0.4) {
+                            robot.SlideSetState(Subsystem.SlideState.Retracted);
+                            robot.ArmSetState(Subsystem.ArmState.Reset);
+                        }
+                        break;
                 }
-                if (robot.isGrabbed() && robot.isIntake()) nextCycle();
                 break;
-            case Return:
-                if (time.seconds() < 0.7) robot.ArmSetState(Subsystem.ArmState.Hover);
-                if (time.seconds() >= 0.7) {
-                    robot.ArmSetState(Subsystem.ArmState.Reset);
-                    robot.PitchSetState(Subsystem.PitchState.Score);
-                }
-                break;
-            case Score:
-                robot.SlideSetState(Subsystem.SlideState.Score);
-                robot.ArmSetState(Subsystem.ArmState.Score);
-                time.reset();
-                break;
-            case Finish:
-                time.startTime();
-                robot.ClawSetState(Subsystem.ClawState.Open);
-                if (time.seconds() > 0.4) {
-                    robot.SlideSetState(Subsystem.SlideState.Retracted);
-                    robot.ArmSetState(Subsystem.ArmState.Reset);
-                }
+            case Spec:
+                //TODO: make spec tele
                 break;
         }
 

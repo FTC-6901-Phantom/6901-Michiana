@@ -261,11 +261,11 @@ public class HardwareSubsystem extends SubsystemBase {
     }
 
     public void init() {
-        ClawSetState(Subsystem.ClawState.Open);
+        ClawSetState(Subsystem.ClawState.Closed);
         WristSetState(Subsystem.WristState.Neutral);
         //ClimbSetState(hardwareMap, Subsystem.ClimbState.Retract);
         SlideSetState(Subsystem.SlideState.Retracted);
         PitchSetState(Subsystem.PitchState.Intake);
-        ArmSetState(Subsystem.ArmState.Reset);
+        ArmSetState(Subsystem.ArmState.Score);
     }
 }

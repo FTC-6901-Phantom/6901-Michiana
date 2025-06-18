@@ -10,6 +10,8 @@ import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Subsystem;
 
 import org.firstinspires.ftc.teamcode.Subsystems.HardwareSubsystem;
@@ -21,16 +23,19 @@ import org.firstinspires.ftc.teamcode.Util.cmd;
 @Autonomous(name = "0+4", group = "Daniella Cortez")
 public class SixSamp extends CommandOpMode {
 
-    public IntakeSubsystem intakeSubsystem;
+    public AutoSubsystem autoSubsystem;
     public HardwareSubsystem robot;
     public Follower follower;
 
+    public double xTolerance = 3, yTolerance = 3;
+    public int scoreTime = 300, grabTime = 700;
+
     @Override
     public void initialize() {
-        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-        robot = intakeSubsystem.robot;
+        autoSubsystem = new AutoSubsystem(hardwareMap, telemetry);
+        robot = autoSubsystem.robot;
 
-        CommandScheduler.getInstance().registerSubsystem(intakeSubsystem);
+        CommandScheduler.getInstance().registerSubsystem(autoSubsystem);
         CommandScheduler.getInstance().registerSubsystem(robot);
 
         Constants.setConstants(FConstants.class, LConstants.class);
@@ -43,59 +48,44 @@ public class SixSamp extends CommandOpMode {
                 new SequentialCommandGroup(
                         // Score preload
                         cmd.followPath(follower, Paths.score1()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
-                        new WaitCommand(1000),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
+                        new InstantCommand(() -> autoSubsystem.autoState = Subsystem.AutoState.Score),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(scoreTime))
+                                .andThen(new InstantCommand(() -> autoSubsystem.nextAutoCycle())),
 
                         // Grab 2nd sample
                         cmd.followPath(follower, Paths.grab2()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
-                        new WaitCommand(800),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
-                        new WaitCommand(200),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
-                        new WaitCommand(300),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.second, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
 
                         // Score 2nd sample
                         cmd.followPath(follower, Paths.score2()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
-                        new WaitCommand(1000),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(scoreTime))
+                                .andThen(new InstantCommand(() -> autoSubsystem.nextAutoCycle())),
 
                         // Grab 3rd sample
                         cmd.followPath(follower, Paths.grab3()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
-                        new WaitCommand(800),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
-                        new WaitCommand(200),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
-                        new WaitCommand(300),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.third, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
 
 
                         // Score 3rd sample
                         cmd.followPath(follower, Paths.score3()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
-                        new WaitCommand(1000),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
-                        
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(scoreTime))
+                                .andThen(new InstantCommand(() -> autoSubsystem.nextAutoCycle())),
                         // Grab 4th sample
                         cmd.followPath(follower, Paths.grab4()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
-                        new WaitCommand(800),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
-                        new WaitCommand(200),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
-                        new WaitCommand(300),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+                        new WaitUntilCommand(() -> follower.atPose(Paths.fourth, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
 
 
                         // Score 4th sample
                         cmd.followPath(follower, Paths.score4()),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
-                        new WaitCommand(1000),
-                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish)                )
+                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
+                        new InstantCommand(() -> autoSubsystem.nextAutoCycle())
+                )
         );
     }
 }
