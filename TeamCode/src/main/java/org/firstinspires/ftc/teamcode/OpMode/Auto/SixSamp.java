@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Util.Constants.FConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.LConstants;
 import org.firstinspires.ftc.teamcode.Util.cmd;
 
-@Autonomous(name = "0+6", group = "Daniella Cortez")
+@Autonomous(name = "0+7", group = "Daniella Cortez")
 public class SixSamp extends CommandOpMode {
 
     public AutoSubsystem autoSubsystem;
@@ -80,7 +80,6 @@ public class SixSamp extends CommandOpMode {
                         new WaitUntilCommand(() -> follower.atPose(Paths.fourth, xTolerance, yTolerance)),
                         new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
 
-
                         // Score 4th sample
                         cmd.followPath(follower, Paths.score4()),
                         new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
@@ -108,7 +107,7 @@ public class SixSamp extends CommandOpMode {
 //                        cmd.followPath(follower, Paths.sub3()),
 //                        new InstantCommand(() -> autoSubsystem.nextAutoCycle()).andThen(new WaitCommand(grabTime)),
 //
-//                        //Score 6th
+//                        //Score 7th
 //                        cmd.followPath(follower, Paths.score7()),
 //                        new WaitUntilCommand(() -> follower.atPose(Paths.score, xTolerance, yTolerance)),
 //                        new InstantCommand(() -> autoSubsystem.nextAutoCycle())
