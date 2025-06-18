@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpMode.Auto;
 
+
 import com.arcrobotics.ftclib.command.*;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -9,6 +10,7 @@ import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.Subsystems.Subsystem;
 
 import org.firstinspires.ftc.teamcode.Subsystems.HardwareSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSubsystem;
@@ -19,19 +21,17 @@ import org.firstinspires.ftc.teamcode.Util.cmd;
 @Autonomous(name = "0+4", group = "Daniella Cortez")
 public class SixSamp extends CommandOpMode {
 
-    public IntakeSubsystem intake;
+    public IntakeSubsystem intakeSubsystem;
     public HardwareSubsystem robot;
     public Follower follower;
 
     @Override
     public void initialize() {
-        intake = new IntakeSubsystem(hardwareMap, telemetry);
-        robot = new HardwareSubsystem(hardwareMap, telemetry);
-        robot.init();
+        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
+        robot = intakeSubsystem.robot;
 
-        CommandScheduler.getInstance().registerSubsystem(intake);
+        CommandScheduler.getInstance().registerSubsystem(intakeSubsystem);
         CommandScheduler.getInstance().registerSubsystem(robot);
-
 
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
@@ -43,51 +43,70 @@ public class SixSamp extends CommandOpMode {
                 new SequentialCommandGroup(
                         // Score preload
                         cmd.followPath(follower, Paths.score1()),
-                        cmd.dropSample(robot),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
                         new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
+
                         // Grab 2nd sample
                         cmd.followPath(follower, Paths.grab2()),
-                        new WaitCommand(1000),
-                        cmd.grabSample(robot),
-                        new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
+                        new WaitCommand(800),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
+                        new WaitCommand(300),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+
                         // Score 2nd sample
                         cmd.followPath(follower, Paths.score2()),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
                         new WaitCommand(1000),
-                        cmd.dropSample(robot),
-                        new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
+
                         // Grab 3rd sample
                         cmd.followPath(follower, Paths.grab3()),
-                        new WaitCommand(1000),
-                        cmd.grabSample(robot),
-                        new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
+                        new WaitCommand(800),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
+                        new WaitCommand(300),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+
+
                         // Score 3rd sample
                         cmd.followPath(follower, Paths.score3()),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
                         new WaitCommand(1000),
-                        cmd.dropSample(robot),
-                        new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish),
+                        
                         // Grab 4th sample
                         cmd.followPath(follower, Paths.grab4()),
-                        new WaitCommand(1000),
-                        cmd.grabSample(robot),
-                        new WaitCommand(1000),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Hover),
+                        new WaitCommand(800),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Intake),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Grab),
+                        new WaitCommand(300),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Return),
+
+
                         // Score 4th sample
                         cmd.followPath(follower, Paths.score4()),
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Score),
                         new WaitCommand(1000),
-                        cmd.dropSample(robot),
-                        new WaitCommand(1000)
-
-                        // Optional: sub2, sub3, drag, park...
-                )
+                        new InstantCommand(() -> intakeSubsystem.cycleState = Subsystem.CycleState.Finish)                )
         );
     }
 }
 
+
 class Paths {
     public static Pose start = new Pose(6.25, 114, Math.toRadians(270));
-    public static Pose score = new Pose(19.5, 128.5, Math.toRadians(-45));
-    public static Pose second = new Pose (33, 123.75, Math.toRadians(0));
-    public static Pose third = new Pose(33, 131, Math.toRadians(0));
-    public static Pose fourth = new Pose(33, 133, Math.toRadians(20.25));
+    public static Pose score = new Pose(14.5, 128, Math.toRadians(-45));
+    public static Pose second = new Pose (32, 122, Math.toRadians(0));
+    public static Pose third = new Pose(31, 131, Math.toRadians(0));
+    public static Pose fourth = new Pose(35, 133, Math.toRadians(28));
     public static Pose drag = new Pose(72-8, 100, Math.toRadians(270));
     public static Pose sub2 = new Pose(63, 94, Math.toRadians(-90));
     public static Pose subControlPoint = new Pose(66.40214477211796, 111.95710455764075);

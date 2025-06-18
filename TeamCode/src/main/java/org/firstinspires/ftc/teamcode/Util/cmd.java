@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Util;
 
 import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -91,14 +93,14 @@ public class cmd {
     public static FollowPath followPath(Follower follower, PathChain pathChain) {
         return new FollowPath(follower, pathChain);
     }
-//    public static grabSample grabSample(HardwareSubsystem robot) {
-//        return new grabSample(robot);
-//    }
-//    public static raiseSlides raiseSlides(HardwareSubsystem robot) {
-//        return new raiseSlides(robot);
+/// mm /        return new raiseSlides(robot);
 //    }
 //    public static dropSample dropSample(HardwareSubsystem robot) {
 //        return new dropSample(robot);
 //    }
 
+
+public static InstantCommand Cycle(IntakeSubsystem intakeSubsystem) {
+    return new InstantCommand(intakeSubsystem::nextCycle);
 }
+        }
