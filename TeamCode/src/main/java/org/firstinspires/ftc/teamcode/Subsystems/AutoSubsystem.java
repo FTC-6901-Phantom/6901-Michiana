@@ -19,7 +19,7 @@ public class AutoSubsystem extends SubsystemBase {
     public Subsystem.WristState wristState;
 
     public AutoSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.autoState = Subsystem.AutoState.Score;
+        this.autoState = Subsystem.AutoState.Start;
         this.wristState = Subsystem.WristState.Neutral;
         this.robot = new HardwareSubsystem(hardwareMap, telemetry);
         this.telemetry = telemetry;
@@ -40,6 +40,9 @@ public class AutoSubsystem extends SubsystemBase {
                 this.autoState = Subsystem.AutoState.Score;
                 break;
             case Score:
+                this.autoState = Subsystem.AutoState.Line;
+                break;
+            case Line:
                 this.autoState = Subsystem.AutoState.Finish;
                 break;
             case Finish:
@@ -64,6 +67,8 @@ public class AutoSubsystem extends SubsystemBase {
         telemetry.addData("Wrist", this.wristState.toString());
 
         switch (autoState) {
+            case Start:
+                break;
             case Hover:
                 time.reset();
                 robot.SlideSetState(Subsystem.SlideState.Retracted);
@@ -74,28 +79,34 @@ public class AutoSubsystem extends SubsystemBase {
                 break;
             case Intake:
                 time.startTime();
-                robot.ArmSetState(Subsystem.ArmState.Intake);
+                robot.ArmSetState(Subsystem.ArmState.Auto);
                 if (robot.isIntake()) nextAutoCycle();
                 break;
             case Grab:
-                if (time.seconds() >= 0.2) {
+                if (time.seconds() >= 0.3) {
                     robot.ClawSetState(Subsystem.ClawState.Closed);
                 }
-                if (robot.isGrabbed() && robot.isIntake()) nextAutoCycle();
                 break;
             case Score:
                 robot.SlideSetState(Subsystem.SlideState.Score);
-                robot.ArmSetState(Subsystem.ArmState.Score);
+                robot.PitchSetState(Subsystem.PitchState.Score);
+                robot.ArmSetState(Subsystem.ArmState.Reset);
                 time.reset();
                 break;
-            case Finish:
+            case Line:
                 time.startTime();
-                robot.PitchSetState(Subsystem.PitchState.Score);
+                robot.ArmSetState(Subsystem.ArmState.AutoScore);
                 if (time.seconds() >= 0.3) robot.ClawSetState(Subsystem.ClawState.Open);
-                if (time.seconds() >= 0.6) {
+                if (robot.Claw.getPosition() == HardwareSubsystem.grabPose) nextAutoCycle();
+                break;
+            case Finish:
+                if (time.seconds() >= 0.5) {
                     robot.ArmSetState(Subsystem.ArmState.Reset);
                     robot.SlideSetState(Subsystem.SlideState.Retracted);
                 }
+                break;
+            case armHover:
+                robot.ArmSetState(Subsystem.ArmState.Hover);
                 break;
         }
 

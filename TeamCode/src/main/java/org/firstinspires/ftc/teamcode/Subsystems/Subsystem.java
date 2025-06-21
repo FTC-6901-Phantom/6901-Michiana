@@ -11,7 +11,8 @@ public class Subsystem {
     //Slide states
     public enum SlideState {
         Retracted,
-        Score
+        Score,
+        Spec
     }
 
     //Claw states
@@ -23,7 +24,8 @@ public class Subsystem {
     //Pitch States
     public enum PitchState {
         Intake,
-        Score
+        Score,
+        Spec
     }
 
     //Arm States
@@ -31,7 +33,10 @@ public class Subsystem {
         Hover,
         Intake,
         Score,
-        Reset
+        Reset,
+        Spec,
+        Auto,
+        AutoScore
     }
 
     //Climb States
@@ -47,22 +52,27 @@ public class Subsystem {
         Grab,
         Return,
         Score,
-        Finish
+        Finish,
+        Nothing
     }
 
     //Auto Cycle states
     public enum AutoState {
+        Start,
         Hover,
         Intake,
         Grab,
         Score,
-        Finish
+        Line,
+        Finish,
+        armHover
     }
 
     //Spec states
     public enum SpecState {
         Intake,
-        Spec
+        Spec,
+        Nothing
     }
 
     //Tele states

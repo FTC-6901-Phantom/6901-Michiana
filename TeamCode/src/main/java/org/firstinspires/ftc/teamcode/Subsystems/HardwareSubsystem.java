@@ -1,15 +1,20 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Util.Controls;
 
-
+@Config
 public class HardwareSubsystem extends SubsystemBase {
     public HardwareMap hardwareMap;
     public Telemetry telemetry;
@@ -25,7 +30,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public DcMotor LeftSlide, RightSlide, LeftHang, RightHang;
 
     //Arm Pose
-    public static double intakePose = 0.15, scorePose = 1, hoverPose = 0.25, nuetral = 0.7;
+    public static double intakePose = 0.15, autoPose = 0.15, scorePose = 0.95, hoverPose = 0.25, nuetral = 0.7, specPose = 0.4, AutoScore = 0.9;
 
     //Claw Pose
     public static double openPose = 0.4, grabPose = 0.65;
@@ -34,13 +39,14 @@ public class HardwareSubsystem extends SubsystemBase {
     public static double nuetralPose = 0.3, horizontalPose = 0.65;
 
     //Pitch Pose
-    public static double pitch = 0.6, Nan = 0;
+    public static double pitch = 0.8, Nan = 0.2, spec = 1;
 
     //Slide Pose
     public static int slideMin = -5;
-    public static int slideMax = 1450;
+    public static int slideMax = 2000;
 
     public static int High = 1450;
+    public static int Spec = 400;
     public static int Reset = 0;
     public int slideCurrent = 0;
 
@@ -48,19 +54,18 @@ public class HardwareSubsystem extends SubsystemBase {
     public static int hangMin = -5;
     public static int hangMax = 1450;
 
-    public static int lineUp = 1450;
+    public static int lineUp = 200;
     public static int climb = 0;
     public int hangCurrent = 0;
 
     public boolean isIntake() {
-        return LeftLift.getPosition() == intakePose;
+        return LeftLift.getPosition() == autoPose;
     }
     public boolean isGrabbed() {
         return Claw.getPosition() == grabPose;
     }
 
     public HardwareSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-
         //Servos
         LeftLift = (Servo) hardwareMap.get("LeftLift");
         RightLift = (Servo) hardwareMap.get("RightLift");
@@ -77,8 +82,8 @@ public class HardwareSubsystem extends SubsystemBase {
         RightHang = (DcMotor) hardwareMap.get("RightHang");
 
         //Slides
-        LeftSlide.setDirection(DcMotorSimple.Direction.FORWARD);
-        RightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        LeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        RightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
 
         LeftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -98,12 +103,6 @@ public class HardwareSubsystem extends SubsystemBase {
     }
 
     //Claw
-    public void ClawGrab() {
-        Claw.setPosition(grabPose);
-    }
-    public void ClawOpen() {
-        Claw.setPosition(openPose);
-    }
     public void ClawSetState(Subsystem.ClawState clawState) {
         this.clawState = clawState;
 
@@ -143,6 +142,15 @@ public class HardwareSubsystem extends SubsystemBase {
                 break;
             case Reset:
                 position = nuetral;
+                break;
+            case Spec:
+                position = specPose;
+                break;
+            case Auto:
+                position = autoPose;
+                break;
+            case AutoScore:
+                position = AutoScore;
                 break;
         }
         this.LeftLift.setPosition(position);
@@ -186,6 +194,9 @@ public class HardwareSubsystem extends SubsystemBase {
             case Score:
                 position = pitch;
                 break;
+            case Spec:
+                position = spec;
+                break;
         }
 
         this.Pitch.setPosition(position);
@@ -202,8 +213,8 @@ public class HardwareSubsystem extends SubsystemBase {
         RightSlide.setTargetPosition(slideCurrent);
         LeftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        LeftSlide.setPower(0.75);
-        RightSlide.setPower(0.75);
+        LeftSlide.setPower(1);
+        RightSlide.setPower(1);
     }
     public void SlideSetState(Subsystem.SlideState slideState) {
         this.slideState = slideState;
@@ -212,10 +223,15 @@ public class HardwareSubsystem extends SubsystemBase {
 
         switch (slideState) {
             case Retracted:
+                LeftSlide.setPower(0.75);
+                RightSlide.setPower(0.75);
                 position = Reset;
                 break;
             case Score:
                 position = High;
+                break;
+            case Spec:
+                position = Spec;
                 break;
         }
         setLiftPose(position);
@@ -229,10 +245,10 @@ public class HardwareSubsystem extends SubsystemBase {
     }
     public void setHang() {
         LeftHang.setTargetPosition(hangCurrent);
-        LeftHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        LeftHang.setPower(1);
         RightHang.setTargetPosition(hangCurrent);
+        LeftHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        LeftHang.setPower(1);
         RightHang.setPower(1);
     }
     public void ClimbSetState(Subsystem.ClimbState climbState) {
@@ -263,7 +279,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public void init() {
         ClawSetState(Subsystem.ClawState.Closed);
         WristSetState(Subsystem.WristState.Neutral);
-        //ClimbSetState(hardwareMap, Subsystem.ClimbState.Retract);
+        //ClimbSetState(Subsystem.ClimbState.Retract);
         SlideSetState(Subsystem.SlideState.Retracted);
         PitchSetState(Subsystem.PitchState.Intake);
         ArmSetState(Subsystem.ArmState.Score);

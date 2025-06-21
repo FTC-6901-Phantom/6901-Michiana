@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.localization.PoseUpdater;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Util.Constants.FConstants;
@@ -15,12 +17,12 @@ public class FollowerSubsystem extends SubsystemBase {
 
     public FollowerSubsystem(HardwareMap hardwareMap) {
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        follower.setStartingPose(Vector.cartesian(0, 0).pose(0));
+        follower.setStartingPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), Math.toRadians(0)));
         follower.startTeleopDrive();
     }
 
-    public void resetIMU() {
-
+    public void imuReset() {
+        follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), Math.toRadians(0)));
     }
 
     public void setMovement(double f, double s, double t) {

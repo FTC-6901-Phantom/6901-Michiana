@@ -16,6 +16,9 @@ public class Controls {
         public GamepadButton Wrist;
         public GamepadButton Lift;
         public GamepadButton Swap;
+        public GamepadButton Reset;
+        public GamepadButton Climb;
+        public GamepadButton ClimbDown;
 
         public DoubleSupplier driveY;
         public DoubleSupplier driveX;
@@ -28,6 +31,9 @@ public class Controls {
             this.Wrist = this.gamepad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER);
             this.Lift = this.gamepad1.getGamepadButton(GamepadKeys.Button.B);
             this.Swap = this.gamepad1.getGamepadButton(GamepadKeys.Button.Y);
+            this.Reset = this.gamepad1.getGamepadButton(GamepadKeys.Button.X);
+            this.Climb = this.gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_UP);
+            this.ClimbDown = this.gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN);
 
             // Method reference to avoid creating a lambda
             this.driveY = this.gamepad1::getLeftY;

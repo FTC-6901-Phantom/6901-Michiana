@@ -70,6 +70,12 @@ public class cmd {
     public static InstantCommand teleSwap(IntakeSubsystem intakeSubsystem) {
         return new InstantCommand(intakeSubsystem::swapTele);
     }
+    public static InstantCommand teleSpec(IntakeSubsystem intakeSubsystem) {
+        return new InstantCommand(intakeSubsystem::nextSpec);
+    }
+    public static InstantCommand teleClimb(IntakeSubsystem intakeSubsystem) {
+        return new InstantCommand(intakeSubsystem::nextClimb);
+    }
 
     //Auto
     public static FollowPath followPath(Follower follower, PathChain pathChain) {
