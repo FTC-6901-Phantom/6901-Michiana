@@ -88,7 +88,7 @@ public class AutoSubsystem extends SubsystemBase {
                 }
                 break;
             case Score:
-                robot.SlideSetState(Subsystem.SlideState.Score);
+                robot.SlideSetState(Subsystem.SlideState.Auto);
                 robot.PitchSetState(Subsystem.PitchState.Score);
                 robot.ArmSetState(Subsystem.ArmState.Reset);
                 time.reset();

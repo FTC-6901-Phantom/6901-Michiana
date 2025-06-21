@@ -27,14 +27,14 @@ public class IntakeSubsystem extends SubsystemBase {
     public Subsystem.WristState wristState;
     public Subsystem.SpecState specState;
     public Subsystem.TeleState teleState;
-    public Subsystem.ClimbState climbState;
+//    public Subsystem.ClimbState climbState;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.wristState = Subsystem.WristState.Neutral;
         this.cycleState = Subsystem.CycleState.Finish;
         this.teleState = Subsystem.TeleState.Sample;
         this.specState = Subsystem.SpecState.Intake;
-        this.climbState = Subsystem.ClimbState.Retract;
+//        this.climbState = Subsystem.ClimbState.Retract;
         this.robot = new HardwareSubsystem(hardwareMap, telemetry);
         this.telemetry = telemetry;
         this.time = new ElapsedTime();
@@ -101,16 +101,16 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    public void nextClimb() {
-        switch (this.climbState) {
-            case Hang:
-                this.climbState = Subsystem.ClimbState.Retract;
-                break;
-            case Retract:
-                this.climbState = Subsystem.ClimbState.Hang;
-                break;
-        }
-    }
+//    public void nextClimb() {
+//        switch (this.climbState) {
+//            case Hang:
+//                this.climbState = Subsystem.ClimbState.Retract;
+//                break;
+//            case Retract:
+//                this.climbState = Subsystem.ClimbState.Hang;
+//                break;
+//        }
+//    }
 
     @Override
     public void periodic() {

@@ -20,7 +20,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public Telemetry telemetry;
     public Servo LeftLift, RightLift;
     public Servo Pitch, Wrist, Claw;
-    public Subsystem.ClimbState climbState;
+//    public Subsystem.ClimbState climbState;
     public Subsystem.SlideState slideState;
     public Subsystem.ClawState clawState;
     public Subsystem.PitchState pitchState;
@@ -30,7 +30,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public DcMotor LeftSlide, RightSlide, LeftHang, RightHang;
 
     //Arm Pose
-    public static double intakePose = 0.15, autoPose = 0.15, scorePose = 0.95, hoverPose = 0.25, nuetral = 0.7, specPose = 0.4, AutoScore = 0.9;
+    public static double intakePose = 0.15, autoPose = 0.15, scorePose = 0.9, hoverPose = 0.25, nuetral = 0.7, specPose = 0.4, AutoScore = 0.9;
 
     //Claw Pose
     public static double openPose = 0.4, grabPose = 0.65;
@@ -45,7 +45,8 @@ public class HardwareSubsystem extends SubsystemBase {
     public static int slideMin = -5;
     public static int slideMax = 2000;
 
-    public static int High = 1550;
+    public static int High = 1600;
+    public static int Auto = 1500;
     public static int Spec = 400;
     public static int Reset = 0;
     public int slideCurrent = 0;
@@ -78,12 +79,12 @@ public class HardwareSubsystem extends SubsystemBase {
         //Motors
         LeftSlide = (DcMotor) hardwareMap.get("LeftSlide");
         RightSlide = (DcMotor) hardwareMap.get("RightSlide");
-        LeftHang = (DcMotor) hardwareMap.get("LeftHang");
-        RightHang = (DcMotor) hardwareMap.get("RightHang");
+//        LeftHang = (DcMotor) hardwareMap.get("LeftHang");
+//        RightHang = (DcMotor) hardwareMap.get("RightHang");
 
         //Slides
-        LeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-        RightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        LeftSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        RightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
         LeftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -92,14 +93,14 @@ public class HardwareSubsystem extends SubsystemBase {
         RightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Hang
-        LeftHang.setDirection(DcMotorSimple.Direction.FORWARD);
-        RightHang.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        LeftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        LeftHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        RightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        LeftHang.setDirection(DcMotorSimple.Direction.FORWARD);
+//        RightHang.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        LeftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        RightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        LeftHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        RightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     //Claw
@@ -233,39 +234,42 @@ public class HardwareSubsystem extends SubsystemBase {
             case Spec:
                 position = Spec;
                 break;
+            case Auto:
+                position = Auto;
+                break;
         }
         setLiftPose(position);
     }
 
     //Hang
-    public void setHangPose(int pos) {
-        if (pos <= hangMax && pos >= hangMin) hangCurrent = pos;
-        System.out.println(hangCurrent);
-        setHang();
-    }
-    public void setHang() {
-        LeftHang.setTargetPosition(hangCurrent);
-        RightHang.setTargetPosition(hangCurrent);
-        LeftHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RightHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        LeftHang.setPower(1);
-        RightHang.setPower(1);
-    }
-    public void ClimbSetState(Subsystem.ClimbState climbState) {
-        this.climbState = climbState;
-
-        int position = 0;
-
-        switch (climbState) {
-            case Retract:
-                position = climb;
-                break;
-            case Hang:
-                position = lineUp;
-                break;
-        }
-        setHangPose(position);
-    }
+//    public void setHangPose(int pos) {
+//        if (pos <= hangMax && pos >= hangMin) hangCurrent = pos;
+//        System.out.println(hangCurrent);
+//        setHang();
+//    }
+//    public void setHang() {
+//        LeftHang.setTargetPosition(hangCurrent);
+//        RightHang.setTargetPosition(hangCurrent);
+//        LeftHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RightHang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        LeftHang.setPower(1);
+//        RightHang.setPower(1);
+//    }
+//    public void ClimbSetState(Subsystem.ClimbState climbState) {
+//        this.climbState = climbState;
+//
+//        int position = 0;
+//
+//        switch (climbState) {
+//            case Retract:
+//                position = climb;
+//                break;
+//            case Hang:
+//                position = lineUp;
+//                break;
+//        }
+//        setHangPose(position);
+//    }
 
     //Auto Stuff
     public void raiseSlides() {

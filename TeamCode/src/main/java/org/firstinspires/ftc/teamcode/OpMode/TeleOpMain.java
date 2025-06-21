@@ -36,7 +36,7 @@ public class TeleOpMain extends CommandOpMode {
         robot = new HardwareSubsystem(hardwareMap, telemetry);
         buttons = new Buttons(gamepad1);
 
-        hang = new Hang(this);  // Pass this OpMode to Hang
+        hang = new Hang(this);
 
         CommandScheduler.getInstance().registerSubsystem(followerSubsystem);
         CommandScheduler.getInstance().registerSubsystem(robot);

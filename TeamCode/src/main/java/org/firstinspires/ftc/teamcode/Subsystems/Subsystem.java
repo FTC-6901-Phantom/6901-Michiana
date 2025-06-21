@@ -12,7 +12,8 @@ public class Subsystem {
     public enum SlideState {
         Retracted,
         Score,
-        Spec
+        Spec,
+        Auto
     }
 
     //Claw states

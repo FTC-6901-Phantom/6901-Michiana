@@ -21,15 +21,14 @@ public class Hang {
         hardwareMap = opMode.hardwareMap;
         telemetry = opMode.telemetry;
 
-        LeftClimb = hardwareMap.get(DcMotor.class, "LClimb");
-        LeftClimb.setDirection(DcMotorSimple.Direction.REVERSE);
+        LeftClimb = hardwareMap.get(DcMotor.class, "LeftHang");
+        LeftClimb.setDirection(DcMotor.Direction.REVERSE);
         LeftClimb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        RightClimb = hardwareMap.get(DcMotor.class, "RClimb");
-        RightClimb.setDirection(DcMotorSimple.Direction.FORWARD);
+        RightClimb = hardwareMap.get(DcMotor.class, "RightHang");
+        RightClimb.setDirection(DcMotor.Direction.FORWARD);
         RightClimb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Reset encoders to start at 0
         LeftClimb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RightClimb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
