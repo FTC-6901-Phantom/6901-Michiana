@@ -45,7 +45,7 @@ public class HardwareSubsystem extends SubsystemBase {
     public static int slideMin = -5;
     public static int slideMax = 2000;
 
-    public static int High = 1450;
+    public static int High = 1550;
     public static int Spec = 400;
     public static int Reset = 0;
     public int slideCurrent = 0;
@@ -223,8 +223,8 @@ public class HardwareSubsystem extends SubsystemBase {
 
         switch (slideState) {
             case Retracted:
-                LeftSlide.setPower(0.75);
-                RightSlide.setPower(0.75);
+                LeftSlide.setPower(0.55);
+                RightSlide.setPower(0.55);
                 position = Reset;
                 break;
             case Score:

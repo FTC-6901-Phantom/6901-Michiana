@@ -188,14 +188,14 @@ public class IntakeSubsystem extends SubsystemBase {
                 break;
         }
 
-        switch (this.climbState) {
-            case Hang:
-                robot.ClimbSetState(Subsystem.ClimbState.Hang);
-                break;
-            case Retract:
-                robot.ClimbSetState(Subsystem.ClimbState.Retract);
-                break;
-        }
+//        switch (this.climbState) {
+//            case Hang:
+//                robot.ClimbSetState(Subsystem.ClimbState.Hang);
+//                break;
+//            case Retract:
+//                robot.ClimbSetState(Subsystem.ClimbState.Retract);
+//                break;
+//        }
 
         switch (this.wristState) {
             case Neutral:
